@@ -10,10 +10,27 @@ export default function Entries() {
 
   const fetchCsvData = async () => {
     try {
-      const response = await fetch('https://raw.githubusercontent.com/abhayjain0x/corporate-announcement-web/main/catalyst-watch.csv?t=' + Date.now());
+      console.log("Fetching CSV data...");
+      const response = await fetch('https://raw.githubusercontent.com/abhayjain0x/corporate-announcement-web/main/catalyst-watch.csv?t=' + Date.now(), {
+        mode: 'cors',
+        headers: {
+          'Accept': 'text/csv'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const csvText = await response.text();
+      console.log("CSV fetched, length:", csvText.length);
+      
+      if (!csvText || csvText.length < 10) {
+        throw new Error("Empty or invalid CSV data");
+      }
       
       const lines = csvText.trim().split('\n');
+      console.log("CSV lines:", lines.length);
       
       const data = lines.slice(1)
         .filter(line => line.trim())
@@ -27,23 +44,25 @@ export default function Entries() {
             if (char === '"') {
               inQuotes = !inQuotes;
             } else if (char === ',' && !inQuotes) {
-              result.push(current);
+              result.push(current.trim());
               current = '';
             } else {
               current += char;
             }
           }
-          result.push(current);
+          result.push(current.trim());
           
           return {
-            date: result[0],
-            company_name: result[1],
-            category: result[2], 
-            summary: result[3]
+            date: result[0] || '',
+            company_name: result[1] || 'Unknown',
+            category: result[2] || 'Unknown', 
+            summary: result[3] || 'No summary available'
           };
         })
+        .filter(item => item.date && item.company_name !== 'Unknown')
         .sort((a, b) => new Date(b.date) - new Date(a.date));
 
+      console.log("Processed entries:", data.length);
       setEntries(data);
       setLastUpdated(new Date());
       setIsError(false);

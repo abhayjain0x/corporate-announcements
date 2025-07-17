@@ -7,10 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "patch-package",
-    "scraper": "cd .. && python main.py",
-    "dev-full": "concurrently \"npm run dev\" \"npm run scraper\"",
-    "start-full": "concurrently \"npm run start\" \"npm run scraper\"",
     "deploy": "npm run build"
   },
   "dependencies": {
@@ -26,8 +22,6 @@
   },
   "devDependencies": {
     "autoprefixer": "^10",
-    "concurrently": "^9.0.1",
-    "patch-package": "^8.0.0",
     "postcss": "^8",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",

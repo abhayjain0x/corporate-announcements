@@ -10,11 +10,11 @@ export default function Home() {
         <div className="mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              <h1 className="text-xl font-semibold text-black font-inter">
-                corporate announcements watch
+              <h1 className="hidden sm:block text-xl font-semibold text-black font-inter">
+                announcements watch
               </h1>
             </div>
-            <div className="absolute left-1/2 transform -translate-x-1/2">
+            <div className="sm:absolute sm:left-1/2 sm:transform sm:-translate-x-1/2">
               <img 
                 src="/favicon.ico" 
                 alt="Logo" 

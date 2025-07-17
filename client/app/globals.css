@@ -45,9 +45,8 @@
 
   /* Invert highlight colors */
   ::selection {
-    background-color: #6366f1;
-    color: #f5f5f5;
-    filter: invert(1);
+    background-color: #000000;
+    color: #ffffff;
   }
 }
 

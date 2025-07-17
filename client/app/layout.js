@@ -3,24 +3,24 @@ import "./globals.css";
 
 export const metadata = {
   metadataBase: new URL("http://www.rsrch.space"),
-  title: "rsrch space",
-  description: "Ishan's favorite links.",
+  title: "announcements watch",
+  description: "Corporate announcements tracking and monitoring.",
   openGraph: {
     type: "website",
     url: "https://www.rsrch.space",
-    site_name: "rsrch space",
+    site_name: "announcements watch",
     images: [
       {
         url: "https://www.rsrch.space/thumbnail.png",
-        alt: "rsrch.space homepage",
+        alt: "announcements watch homepage",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@ishan0102",
-    title: "rsrch space",
-    description: "Ishan's favorite links",
+    title: "announcements watch",
+    description: "Corporate announcements tracking and monitoring",
     image: "https://www.rsrch.space/thumbnail.png",
   },
 };

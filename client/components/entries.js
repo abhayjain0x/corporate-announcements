@@ -8,66 +8,58 @@ export default function Entries() {
   const [isError, setIsError] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  const fetchCsvData = async () => {
+  const fetchAirtableData = async () => {
     try {
-      console.log("Fetching CSV data...");
-      const response = await fetch('https://raw.githubusercontent.com/abhayjain0x/corporate-announcement-web/main/catalyst-watch.csv?t=' + Date.now(), {
-        mode: 'cors',
+      console.log("Fetching Airtable data...");
+      let allRecords = [];
+      let offset = null;
+      
+      do {
+        const url = `https://api.airtable.com/v0/app727E6XRxUhiNW7/tblqVD8DZ7STEeIKD?sort[0][field]=date&sort[0][direction]=desc${offset ? `&offset=${offset}` : ''}`;
+        
+        const response = await fetch(url, {
         headers: {
-          'Accept': 'text/csv'
+            'Authorization': 'Bearer patRTIph8DJrW3JXv.454641783dd1a025712ca81645b1031ee2202804a793c3772e4a92c2031760d3',
+            'Content-Type': 'application/json'
         }
       });
+        
+        if (response.status === 429) {
+          console.log("Rate limited, waiting 30 seconds...");
+          await new Promise(resolve => setTimeout(resolve, 30000));
+          continue;
+        }
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const csvText = await response.text();
-      console.log("CSV fetched, length:", csvText.length);
+        const data = await response.json();
+        allRecords = [...allRecords, ...data.records];
+        offset = data.offset;
+        
+        console.log(`Fetched ${data.records.length} records, total: ${allRecords.length}`);
+      } while (offset);
       
-      if (!csvText || csvText.length < 10) {
-        throw new Error("Empty or invalid CSV data");
+      console.log("Total Airtable records fetched:", allRecords.length);
+      
+      if (allRecords.length === 0) {
+        throw new Error("No records found in Airtable");
       }
       
-      const lines = csvText.trim().split('\n');
-      console.log("CSV lines:", lines.length);
-      
-      const data = lines.slice(1)
-        .filter(line => line.trim())
-        .map(line => {
-          const result = [];
-          let current = '';
-          let inQuotes = false;
-          
-          for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            if (char === '"') {
-              inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-              result.push(current.trim());
-              current = '';
-            } else {
-              current += char;
-            }
-          }
-          result.push(current.trim());
-          
-          return {
-            date: result[0] || '',
-            company_name: result[1] || 'Unknown',
-            category: result[2] || 'Unknown', 
-            summary: result[3] || 'No summary available'
-          };
-        })
-        .filter(item => item.date && item.company_name !== 'Unknown')
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+      const processedEntries = allRecords.map(record => ({
+        date: record.fields.date || '',
+        company_name: record.fields.company_name || 'Unknown',
+        category: record.fields.category || 'Unknown',
+        summary: record.fields.summary || 'No summary available'
+      }));
 
-      console.log("Processed entries:", data.length);
-      setEntries(data);
+      console.log("Processed entries:", processedEntries.length);
+      setEntries(processedEntries);
       setLastUpdated(new Date());
       setIsError(false);
     } catch (error) {
-      console.error("Error fetching CSV data:", error);
+      console.error("Error fetching Airtable data:", error);
       setIsError(true);
     } finally {
       setIsLoading(false);
@@ -75,12 +67,8 @@ export default function Entries() {
   };
 
   useEffect(() => {
-    // Initial fetch
-    fetchCsvData();
-
-    // Set up auto-refresh every 30 seconds
-    const interval = setInterval(fetchCsvData, 30000);
-
+    fetchAirtableData();
+    const interval = setInterval(fetchAirtableData, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -99,9 +87,7 @@ export default function Entries() {
         <div className="text-xs text-gray-500">
           {lastUpdated && `Last updated: ${lastUpdated.toLocaleTimeString()}`}
         </div>
-        <div className="text-xs text-gray-500">
-          Auto-refreshing every 30s
-        </div>
+
       </div>
       <ListView entries={entries} />
     </div>

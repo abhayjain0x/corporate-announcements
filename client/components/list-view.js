@@ -2,26 +2,51 @@ import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 
 function Entry({ company_name, category, summary, date }) {
-  const dateObj = new Date(date);
-  const formattedDate = dateObj.toISOString().split("T")[0];
+  let formattedDate = 'Invalid Date';
+  
+  try {
+    const dateObj = new Date(date);
+    if (!isNaN(dateObj.getTime())) {
+      formattedDate = dateObj.toISOString().split("T")[0];
+    }
+  } catch (error) {
+    console.warn('Invalid date format:', date);
+  }
 
   return (
-    <div className="text-secondary text-md group grid grid-cols-12 gap-4 py-3">
-      <div className="col-span-2 font-medium text-black group-hover:text-primary text-sm">
-        {company_name}
+    <>
+      {/* Desktop Table Layout */}
+      <div className="hidden sm:grid text-secondary text-md group grid-cols-12 gap-4 py-3">
+        <div className="col-span-2 font-medium text-black text-sm">
+          {company_name}
+        </div>
+        <div className="col-span-2 text-xs text-black px-2 py-1 self-start">
+          {category}
+        </div>
+        <div className="col-span-6 text-black text-sm leading-relaxed">
+          {summary}
+        </div>
+        <div className="col-span-2 text-right">
+          <p className="font-berkeley text-black text-sm whitespace-nowrap">
+            {formattedDate}
+          </p>
+        </div>
       </div>
-      <div className="col-span-2 text-xs text-black px-2 py-1 self-start">
-        {category}
+
+      {/* Mobile Card Layout */}
+      <div className="block sm:hidden bg-white/10 backdrop-blur-sm border border-gray-200/30 rounded-lg p-4 mb-3 shadow-sm">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-medium text-black text-sm">{company_name}</h3>
+          <span className="text-xs text-gray-600 font-berkeley">{formattedDate}</span>
+        </div>
+        <div className="mb-2">
+          <span className="inline-block bg-black/10 backdrop-blur-sm text-black text-xs px-2 py-1 rounded border border-gray-300/30">
+            {category}
+          </span>
+        </div>
+        <p className="text-black text-sm leading-relaxed">{summary}</p>
       </div>
-      <div className="col-span-6 text-black text-sm leading-relaxed">
-        {summary}
-      </div>
-      <div className="col-span-2 text-right">
-        <p className="font-berkeley text-black text-sm whitespace-nowrap">
-          {formattedDate}
-        </p>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -40,21 +65,21 @@ export default function ListView({ entries }) {
   return (
     <>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative max-w-[240px] flex-grow">
+        <div className="relative w-full sm:max-w-[240px] flex-grow">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <SearchIcon className="h-4 w-4 text-gray-500" />
           </div>
           <input
             type="text"
-            placeholder="Search"
+placeholder="Search"
             onChange={handleSearchChange}
             className="w-full rounded-md border border-gray-400 bg-[#f0eadd] px-3 py-2.5 pl-8 text-sm font-medium text-gray-600 placeholder-gray-500"
           />
         </div>
       </div>
 
-      {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 py-2 border-b border-gray-200 mb-2">
+      {/* Desktop Table Header */}
+      <div className="hidden sm:grid grid-cols-12 gap-4 py-2 border-b border-gray-200 mb-2">
         <div className="col-span-2 font-medium text-black uppercase tracking-wide font-courier" style={{fontSize: '15px'}}>
           Company
         </div>

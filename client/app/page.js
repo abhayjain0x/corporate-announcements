@@ -21,6 +21,16 @@ export default function Home() {
                 className="h-8 w-8"
               />
             </div>
+            <div className="flex items-center">
+              <Link 
+                href="https://x.com/abhayjainp" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-black hover:text-gray-600 font-inter text-sm"
+              >
+                x
+              </Link>
+            </div>
           </div>
         </div>
       </nav>

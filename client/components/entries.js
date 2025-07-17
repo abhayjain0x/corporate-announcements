@@ -51,7 +51,8 @@ export default function Entries() {
         date: record.fields.date || '',
         company_name: record.fields.company_name || 'Unknown',
         category: record.fields.category || 'Unknown',
-        summary: record.fields.summary || 'No summary available'
+        summary: record.fields.summary || 'No summary available',
+        url: record.fields.url || ''
       }));
 
       console.log("Processed entries:", processedEntries.length);

@@ -1,7 +1,7 @@
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 
-function Entry({ company_name, category, summary, date }) {
+function Entry({ company_name, category, summary, date, url }) {
   let formattedDate = 'Invalid Date';
   
   try {
@@ -18,7 +18,18 @@ function Entry({ company_name, category, summary, date }) {
       {/* Desktop Table Layout */}
       <div className="hidden sm:grid text-secondary text-md group grid-cols-12 gap-4 py-3">
         <div className="col-span-2 font-medium text-black text-sm">
-          {company_name}
+          {url ? (
+            <a 
+              href={url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {company_name}
+            </a>
+          ) : (
+            company_name
+          )}
         </div>
         <div className="col-span-2 text-xs text-black px-2 py-1 self-start">
           {category}
@@ -36,7 +47,20 @@ function Entry({ company_name, category, summary, date }) {
       {/* Mobile Card Layout */}
       <div className="block sm:hidden bg-white/10 backdrop-blur-sm border border-gray-200/30 rounded-lg p-4 mb-3 shadow-sm">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-medium text-black text-sm">{company_name}</h3>
+          <h3 className="font-medium text-black text-sm">
+            {url ? (
+              <a 
+                href={url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {company_name}
+              </a>
+            ) : (
+              company_name
+            )}
+          </h3>
           <span className="text-xs text-gray-600 font-berkeley">{formattedDate}</span>
         </div>
         <div className="mb-2">
@@ -101,6 +125,7 @@ placeholder="Search"
           category={entry.category}
           summary={entry.summary}
           date={entry.date}
+          url={entry.url}
         />
       ))}
     </>

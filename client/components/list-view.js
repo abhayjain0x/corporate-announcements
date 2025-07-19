@@ -112,7 +112,15 @@ export default function ListView({ entries }) {
     const date = new Date(dateString);
     const now = new Date();
     
-    const isToday = date.toDateString() === now.toDateString();
+    // Get date strings in YYYY-MM-DD format for accurate comparison
+    const entryDateStr = date.getFullYear() + '-' + 
+                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(date.getDate()).padStart(2, '0');
+    const todayStr = now.getFullYear() + '-' + 
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(now.getDate()).padStart(2, '0');
+    
+    const isToday = entryDateStr === todayStr;
     if (isToday) return "today";
     
     const diffTime = now - date;
@@ -134,8 +142,10 @@ export default function ListView({ entries }) {
     let matchesDate = true;
     if (dateFilter === "custom" && customDate) {
       const entryDate = new Date(entry.date);
-      const selectedDate = new Date(customDate);
-      matchesDate = entryDate.toDateString() === selectedDate.toDateString();
+      const entryDateStr = entryDate.getFullYear() + '-' + 
+                          String(entryDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(entryDate.getDate()).padStart(2, '0');
+      matchesDate = entryDateStr === customDate;
     } else if (dateFilter !== "all" && dateFilter !== "custom") {
       const dateCategory = getDateCategory(entry.date);
       if (dateFilter === "week") {

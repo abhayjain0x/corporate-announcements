@@ -7,7 +7,13 @@ function Entry({ company_name, category, summary, date, url }) {
   try {
     const dateObj = new Date(date);
     if (!isNaN(dateObj.getTime())) {
-      formattedDate = dateObj.toISOString().split("T")[0];
+      // Convert to IST timezone for display
+      formattedDate = dateObj.toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
     }
   } catch (error) {
     console.warn('Invalid date format:', date);
@@ -109,26 +115,34 @@ export default function ListView({ entries }) {
   const uniqueCategories = [...new Set(entries.map(entry => entry.category))].filter(Boolean).sort();
 
   const getDateCategory = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
+    // Convert to IST timezone for proper comparison
+    const entryDate = new Date(dateString);
+    const today = new Date();
     
-    // Get date strings in YYYY-MM-DD format for accurate comparison
-    const entryDateStr = date.getFullYear() + '-' + 
-                        String(date.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(date.getDate()).padStart(2, '0');
-    const todayStr = now.getFullYear() + '-' + 
-                    String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-                    String(now.getDate()).padStart(2, '0');
+    // Get IST date strings
+    const entryDateStr = entryDate.toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit'
+    });
+    const todayStr = today.toLocaleDateString('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
     
-    const isToday = entryDateStr === todayStr;
-    if (isToday) return "today";
-    
-    const diffTime = now - date;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays >= 0 && diffDays <= 7) return "week";
-    if (diffDays <= 30) return "month";
+    if (entryDateStr === todayStr) return "today";
+    if (entryDateStr >= getDateDaysAgo(7)) return "week";
+    if (entryDateStr >= getDateDaysAgo(30)) return "month";
     return "older";
+  };
+
+  const getDateDaysAgo = (days) => {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    return date.toISOString().split('T')[0];
   };
 
   const filteredEntries = entries.filter((entry) => {
@@ -142,9 +156,12 @@ export default function ListView({ entries }) {
     let matchesDate = true;
     if (dateFilter === "custom" && customDate) {
       const entryDate = new Date(entry.date);
-      const entryDateStr = entryDate.getFullYear() + '-' + 
-                          String(entryDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                          String(entryDate.getDate()).padStart(2, '0');
+      const entryDateStr = entryDate.toLocaleDateString('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
       matchesDate = entryDateStr === customDate;
     } else if (dateFilter !== "all" && dateFilter !== "custom") {
       const dateCategory = getDateCategory(entry.date);
